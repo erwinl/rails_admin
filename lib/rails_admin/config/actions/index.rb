@@ -82,6 +82,18 @@ module RailsAdmin
                   render text: output
                 end
               end
+
+              format.xls do
+                header, encoding, output = XLSConverter.new(@objects, @schema).to_xls(params[:csv_options].permit!.to_h)
+                if params[:send_data]
+                  send_data output,
+                            type: "application/vnd.ms-excel; charset=#{encoding}; #{'header=present' if header}",
+                            disposition: "attachment; filename=#{params[:model_name]}_#{DateTime.now.strftime('%Y-%m-%d_%Hh%Mm%S')}.xls"
+                else
+                  render text: output
+                end
+              end
+
             end
           end
         end
